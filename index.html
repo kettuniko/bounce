@@ -15,7 +15,7 @@
       })
 
       function addBall(initialX, initialY) {
-        var $ball = $('<div class="ball"/>').appendTo('body')
+        var $ball = createBall()
 
         var goingDown   = true,
             goingRight  = true
@@ -55,6 +55,10 @@
 
         Bacon.interval(1, $ball).map('.offset').map(toNextPosition).onValue(moveBall)
 
+      }
+
+      function createBall() {
+        return $('<div class="ball"/>').appendTo('body')
       }
     </script>
   </head>
