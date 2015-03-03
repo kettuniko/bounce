@@ -9,19 +9,19 @@
     <script>
 
       $(function() {
-        addBall(0, 0)
-        addBall(102, 23)
-        addBall(13, 200)
+        addBall({left: 0, top: 0})
+        addBall({left: 103, top: 23})
+        addBall({left: 13, top: 200})
       })
 
-      function addBall(initialX, initialY) {
+      function addBall(position) {
         var $ball = createBall()
 
         var goingDown   = true,
             goingRight  = true
 
         var positionStream    = new Bacon.Bus(),
-            positionProperty  = positionStream.toProperty({left: initialX, top: initialY}),
+            positionProperty  = positionStream.toProperty(position),
             verticalStream    = positionStream.map('.top'),
             horizontalStream  = positionStream.map('.left'),
             hitsBottom        = verticalStream.filter(isGoingDown).filter(isAtMax, 'innerHeight'),
