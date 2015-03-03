@@ -21,7 +21,7 @@
             goingRight  = true
 
         var positionStream    = new Bacon.Bus(),
-            position          = positionStream.toProperty({left: initialX, top: initialY}),
+            positionProperty  = positionStream.toProperty({left: initialX, top: initialY}),
             verticalStream    = positionStream.map('.top'),
             horizontalStream  = positionStream.map('.left'),
             hitsBottom        = verticalStream.filter(isGoingDown).filter(isAtMax, 'innerHeight'),
@@ -31,7 +31,7 @@
             hitsTopOrBottom   = hitsBottom.merge(hitsTop),
             hitsRightOrLeft   = hitsRight.merge(hitsLeft)
 
-        position.onValue(updatePosition)
+        positionProperty.onValue(updatePosition)
         hitsTopOrBottom.onValue(flipY)
         hitsRightOrLeft.onValue(flipX)
 
