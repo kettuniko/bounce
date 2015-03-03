@@ -9,12 +9,12 @@
     <script>
 
       $(function() {
-        createBall(0, 0)
-        createBall(102, 23)
-        createBall(13, 200)
+        addBall(0, 0)
+        addBall(102, 23)
+        addBall(13, 200)
       })
 
-      function createBall(initialX, initialY) {
+      function addBall(initialX, initialY) {
         var $ball = $('<div class="ball"/>').appendTo('body')
 
         var goingDown   = true,
