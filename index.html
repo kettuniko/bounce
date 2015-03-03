@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <style>
+      html, body { margin: 0; background-color: rgba(40, 40, 40, 0.84) }
+      .ball {position: absolute;  border-radius: 999px;}
+      .ball1 {background-color: #FF0000; width: 40px; height: 40px; border: 2px solid yellow;}
+      .ball2 {background-color: #FFFC19; width: 100px; height: 100px; border: 2px dotted #FF00FF;}
+      .ball3 {background-color: #1485CC; width: 200px; height: 200px; border: 10px solid cyan;}
+    </style>
+    <script src="jquery-2.1.3.js"></script>
+    <script src="Bacon.js"></script>
+    <script>
+
+      $(function() {
+        createBall('.ball1', 0, 0)
+        createBall('.ball2', 102, 23)
+        createBall('.ball3', 13, 200)
+      })
+
+      function createBall(ballSelector, initialX, initialY) {
+        var $ball = $(ballSelector), goingDown = true, goingRight = true
+
+        var positionStream    = new Bacon.Bus(),
+            position          = positionStream.toProperty({left: initialX, top: initialY}),
+            verticalStream    = positionStream.map('.top'),
+            horizontalStream  = positionStream.map('.left'),
+            hitsBottom        = verticalStream.filter(isGoingDown).filter(isAtMax, 'innerHeight'),
+            hitsTop           = verticalStream.filter(isGoingUp).filter(isZero),
+            hitsRight         = horizontalStream.filter(isGoingRight).filter(isAtMax, 'innerWidth'),
+            hitsLeft          = horizontalStream.filter(isGoingLeft).filter(isZero),
+            hitsTopOrBottom   = hitsBottom.merge(hitsTop),
+            hitsRightOrLeft   = hitsRight.merge(hitsLeft)
+
+        position.onValue(updatePosition)
+        hitsTopOrBottom.onValue(flipY)
+        hitsRightOrLeft.onValue(flipX)
+
+        function isAtMax(dimension, position) { return position === window[dimension] - $ball.outerWidth()}
+        function isZero(target) { return target === 0 }
+        function updatePosition(position) {$ball.css(position)}
+
+        function flipY() { goingDown  = !goingDown }
+        function flipX() { goingRight = !goingRight }
+
+        function isGoingDown() { return goingDown }
+        function isGoingUp() { return !goingDown }
+        function isGoingRight() { return goingRight }
+        function isGoingLeft() { return !goingRight }
+
+        function nextX(currentX) { return isGoingRight() ? currentX + 1 : currentX - 1 }
+        function nextY(currentY) { return isGoingDown() ? currentY + 1 : currentY - 1 }
+
+        function moveBall(position) { positionStream.push(position) }
+        function toNextPosition(position) { return { left: nextX(position.left), top: nextY(position.top) } }
+
+        Bacon.interval(1, $ball).map('.offset').map(toNextPosition).onValue(moveBall)
+
+      }
+    </script>
+  </head>
+  <body>
+    <div class="ball ball1"></div>
+    <div class="ball ball2"></div>
+    <div class="ball ball3"></div>
+  </body>
+</html>
