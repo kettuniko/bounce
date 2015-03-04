@@ -2,26 +2,24 @@
   <head>
     <style>
       html, body { margin: 0; background-color: rgba(40, 40, 40, 0.84) }
-      .ball {position: absolute;  border-radius: 999px;}
+      .ball {position: absolute;  border-radius: 999px; border-style: solid}
     </style>
     <script src="jquery-2.1.3.js"></script>
     <script src="Bacon.js"></script>
     <script>
 
       $(function() {
-        addBall({left: 0, top: 0})
-        addBall({left: 103, top: 23})
-        addBall({left: 13, top: 200})
+        Bacon.interval(500).take(10).onValue(addBall)
       })
 
-      function addBall(position) {
+      function addBall() {
         var $ball = createBall()
 
         var goingDown   = true,
             goingRight  = true
 
         var positionStream    = new Bacon.Bus(),
-            positionProperty  = positionStream.toProperty(position),
+            positionProperty  = positionStream.toProperty({left: randomNumber(0, 555), top: randomNumber(0, 555)}),
             verticalStream    = positionStream.map('.top'),
             horizontalStream  = positionStream.map('.left'),
             hitsBottom        = verticalStream.filter(isGoingDown).filter(isAtMax, 'innerHeight'),
@@ -58,7 +56,27 @@
       }
 
       function createBall() {
-        return $('<div class="ball"/>').appendTo('body')
+        var diameter = randomNumber(2, 300)
+
+        var style = {
+          width: diameter,
+          height: diameter,
+          backgroundColor: randomCssRgba(),
+          borderWidth: randomNumber(0, 20),
+          borderColor: randomCssRgba()
+        }
+
+        return $('<div class="ball"/>').appendTo('body').css(style)
+      }
+
+
+      function randomCssRgba () {
+        var rgbaArray = [randomNumber(0, 255), randomNumber(0, 255), randomNumber(0, 255), randomNumber(50, 100) * 0.01]
+        return 'rgba(' + rgbaArray.join(',') + ')'
+      }
+
+      function randomNumber(min ,max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
       }
     </script>
   </head>
