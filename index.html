@@ -51,7 +51,7 @@
         function moveBall(position) { positionStream.push(position) }
         function toNextPosition(position) { return { left: nextX(position.left), top: nextY(position.top) } }
 
-        Bacon.interval(1, $ball).map('.offset').map(toNextPosition).onValue(moveBall)
+        Bacon.interval(16, $ball).map('.offset').map(toNextPosition).onValue(moveBall)
 
       }
 
