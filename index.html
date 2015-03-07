@@ -6,20 +6,34 @@
     </style>
     <script src="jquery-2.1.3.js"></script>
     <script src="Bacon.js"></script>
+    <script src="lodash.js"></script>
     <script>
 
       $(function() {
-        Bacon.interval(500).take(10).onValue(addBall)
+        var balls = []
+
+        for(var i = 0; i < 50; i ++) {
+          balls.push(addBall())
+        }
+        Bacon.interval(16, balls).doAction().onValue(moveBalls)
+
+
+        function moveBalls(balls) {
+          _.invoke(balls, 'updatePosition')
+          _.invoke(balls, 'move')
+        }
       })
 
       function addBall() {
+        var position = {left: randomNumber(0, 555), top: randomNumber(0, 555)}
+
         var $ball = createBall()
 
         var goingDown   = true,
             goingRight  = true
 
         var positionStream    = new Bacon.Bus(),
-            positionProperty  = positionStream.toProperty({left: randomNumber(0, 555), top: randomNumber(0, 555)}),
+            positionProperty  = positionStream.toProperty(position),
             verticalStream    = positionStream.map('.top'),
             horizontalStream  = positionStream.map('.left'),
             hitsBottom        = verticalStream.filter(isGoingDown).filter(isAtMax, 'innerHeight'),
@@ -45,13 +59,22 @@
         function isGoingRight() { return goingRight }
         function isGoingLeft() { return !goingRight }
 
-        function nextX(currentX) { return isGoingRight() ? currentX + 1 : currentX - 1 }
-        function nextY(currentY) { return isGoingDown() ? currentY + 1 : currentY - 1 }
+        function nextX() { return isGoingRight() ? position.left + 1 : position.left - 1 }
+        function nextY() { return isGoingDown() ? position.top + 1 : position.top - 1 }
 
-        function moveBall(position) { positionStream.push(position) }
-        function toNextPosition(position) { return { left: nextX(position.left), top: nextY(position.top) } }
+        function moveBall() { positionStream.push(position) }
+        function toNextPosition() { position.left = nextX(); position.top = nextY()}
 
-        Bacon.interval(16, $ball).map('.offset').map(toNextPosition).onValue(moveBall)
+        //Bacon.interval(16, balls).map('.offset').map(toNextPosition).onValue(moveBall)
+        return {
+          move : function(){
+            moveBall()
+          },
+          updatePosition: function() {
+             toNextPosition()
+          }
+        }
+
 
       }
 
