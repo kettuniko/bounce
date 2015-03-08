@@ -1,7 +1,7 @@
 <html>
   <head>
     <style>
-      html, body { margin: 0; background-color: rgba(40, 40, 40, 0.84) }
+      html, body { margin: 0; }
     </style>
     <script src="Bacon.js"></script>
     <script src="lodash.js"></script>
@@ -11,6 +11,8 @@
   </body>
 
   <script>
+    document.body.style.backgroundColor = randomCssRgba()
+    
       var canvas  = document.getElementById('canvas'),
           context = canvas.getContext('2d'),
           FPS_60  = 1000/60,
