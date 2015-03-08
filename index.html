@@ -92,13 +92,9 @@
         }
       }
 
-      function randomCssRgba () {
-        var rgbaArray = [randomNumber(0, 255), randomNumber(0, 255), randomNumber(0, 255), randomNumber(50, 100) * 0.01]
-        return 'rgba(' + rgbaArray.join(',') + ')'
-      }
-
-      function randomNumber(min ,max) {
-        return Math.floor(Math.random() * (max - min + 1) + min);
-      }
+      function randomCssRgba () { return _.template('rgba(${rgba})')({rgba: _.times(3, randomColorNumber).concat(randomAlpha()).join(',')}) }
+      function randomAlpha () { return randomNumber(50, 100) * 0.01 }
+      function randomColorNumber() { return randomNumber(0, 255) }
+      function randomNumber(min ,max) { return Math.floor(Math.random() * (max - min + 1) + min) }
   </script>
 </html>
