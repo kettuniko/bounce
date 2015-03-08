@@ -29,6 +29,8 @@
       }
 
       function createBall() {
+        var speed = 1
+
         var goingDown = true, goingRight = true
 
         var backgroundColor = randomCssRgba(),
@@ -77,8 +79,8 @@
         function isGoingRight() { return goingRight }
         function isGoingLeft() { return !goingRight }
 
-        function nextX(currentX) { return isGoingRight() ? currentX + 1 : currentX - 1 }
-        function nextY(currentY) { return isGoingDown() ? currentY + 1 : currentY - 1 }
+        function nextX(currentX) { return isGoingRight() ? currentX + speed : currentX - speed }
+        function nextY(currentY) { return isGoingDown() ? currentY + speed : currentY - speed }
 
         function toNextPosition(position) {return { x: nextX(position.x), y: nextY(position.y) } }
         function moveBall(position) { positionStream.push(position) }
