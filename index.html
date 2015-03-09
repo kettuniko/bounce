@@ -15,17 +15,17 @@
     
       var canvas  = document.getElementById('canvas'),
           context = canvas.getContext('2d'),
-          FPS_60  = 1000/60,
           balls   = _.times(50, createBall)
 
       canvas.width  = window.innerWidth
       canvas.height = window.innerHeight
 
-      Bacon.interval(FPS_60).onValue(reDrawAll)
+      requestAnimationFrame(reDrawAll)
 
       function reDrawAll() {
         context.clearRect(0, 0, window.innerWidth, window.innerHeight)
         _.invoke(balls, 'move')
+        requestAnimationFrame(reDrawAll)
       }
 
       function createBall() {
