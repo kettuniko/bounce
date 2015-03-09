@@ -11,13 +11,9 @@
   </body>
 
   <script>
-      var canvas  = document.getElementById('canvas'),
+      var canvas  = createCanvas(),
           context = canvas.getContext('2d'),
           balls   = _.times(50, createBall)
-
-      canvas.style.backgroundColor = randomCssRgba()
-      canvas.width  = window.innerWidth
-      canvas.height = window.innerHeight
 
       requestAnimationFrame(reDrawAll)
 
@@ -84,5 +80,18 @@
       function randomColorNumber() { return randomNumber(0, 255) }
       function randomNumber(min ,max) { return Math.floor(Math.random() * (max - min + 1) + min) }
       function randomBoolean() { return Math.random() >= 0.5 }
+
+      function createCanvas() {
+        var canvas = document.getElementById('canvas')
+        canvas.style.backgroundColor = randomCssRgba()
+        maximize(canvas)
+        window.onresize = maximize
+
+        function maximize() {
+          canvas.width  = window.innerWidth
+          canvas.height = window.innerHeight
+        }
+        return canvas
+      }
   </script>
 </html>
