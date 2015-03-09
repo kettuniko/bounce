@@ -42,15 +42,9 @@
             initialY        = randomNumber(realRadius, window.innerHeight - realRadius)
 
         var positionStream    = new Bacon.Bus(),
-            positionProperty  = positionStream.toProperty({x: initialX, y: initialY}),
-            horizontalStream  = positionStream.map('.x'),
-            verticalStream    = positionStream.map('.y'),
-            hitsBottom        = verticalStream.filter(isGoingDown).filter(isAtMax, 'innerHeight'),
-            hitsTop           = verticalStream.filter(isGoingUp).filter(isAtMin),
-            hitsRight         = horizontalStream.filter(isGoingRight).filter(isAtMax, 'innerWidth'),
-            hitsLeft          = horizontalStream.filter(isGoingLeft).filter(isAtMin),
-            hitsTopOrBottom   = hitsBottom.merge(hitsTop),
-            hitsRightOrLeft   = hitsRight.merge(hitsLeft)
+            positionProperty  = positionStream.toProperty({ x: initialX, y: initialY }),
+            hitsTopOrBottom   = positionStream.map('.y').filter(isAtMaxBoundary, 'innerHeight'),
+            hitsRightOrLeft   = positionStream.map('.x').filter(isAtMaxBoundary, 'innerWidth')
 
         positionProperty.onValue(reDraw)
         hitsTopOrBottom.onValue(flipY)
@@ -68,21 +62,15 @@
           context.stroke()
         }
 
-        function isAtMin(positionOnDimension){return positionOnDimension <= realRadius}
-        function isAtMax(lengthProperty, positionOnDimension) { return positionOnDimension + realRadius >= window[lengthProperty]}
+        function isAtMaxBoundary(dimension, position) { return position - realRadius <= 0 || position + realRadius >= window[dimension] }
 
         function flipY() { goingDown  = !goingDown }
         function flipX() { goingRight = !goingRight }
 
-        function isGoingDown() { return goingDown }
-        function isGoingUp() { return !goingDown }
-        function isGoingRight() { return goingRight }
-        function isGoingLeft() { return !goingRight }
+        function nextX(currentX) { return goingRight ? currentX + speed : currentX - speed }
+        function nextY(currentY) { return goingDown ? currentY + speed : currentY - speed }
 
-        function nextX(currentX) { return isGoingRight() ? currentX + speed : currentX - speed }
-        function nextY(currentY) { return isGoingDown() ? currentY + speed : currentY - speed }
-
-        function toNextPosition(position) {return { x: nextX(position.x), y: nextY(position.y) } }
+        function toNextPosition(position) { return { x: nextX(position.x), y: nextY(position.y) } }
         function moveBall(position) { positionStream.push(position) }
 
         return {
