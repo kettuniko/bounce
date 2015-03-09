@@ -11,12 +11,11 @@
   </body>
 
   <script>
-    document.body.style.backgroundColor = randomCssRgba()
-    
       var canvas  = document.getElementById('canvas'),
           context = canvas.getContext('2d'),
           balls   = _.times(50, createBall)
 
+      canvas.style.backgroundColor = randomCssRgba()
       canvas.width  = window.innerWidth
       canvas.height = window.innerHeight
 
