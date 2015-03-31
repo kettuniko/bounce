@@ -13,17 +13,17 @@
   <script>
       var canvas  = createCanvas(),
           context = canvas.getContext('2d'),
-          balls   = _.times(50, createBall)
+          rects   = _.times(50, createRect)
 
       requestAnimationFrame(reDrawAll)
 
       function reDrawAll() {
         context.clearRect(0, 0, window.innerWidth, window.innerHeight)
-        _.invoke(balls, 'move')
+        _.invoke(rects, 'move')
         requestAnimationFrame(reDrawAll)
       }
 
-      function createBall() {
+      function createRect() {
         var speed = randomNumber(1, 2)
 
         var goingDown = randomBoolean(), goingRight = randomBoolean()
@@ -38,8 +38,14 @@
 
         var positionStream    = new Bacon.Bus(),
             positionProperty  = positionStream.toProperty({ x: initialX, y: initialY }),
-            hitsTopOrBottom   = positionStream.map('.y').filter(isAtMaxBoundary, 'innerHeight'),
-            hitsRightOrLeft   = positionStream.map('.x').filter(isAtMaxBoundary, 'innerWidth')
+            verticalStream    = positionStream.map('.y'),
+            horizontalStream  = positionStream.map('.x'),
+            hitsTop           = verticalStream.filter(minBoundary),
+            hitsBottom        = verticalStream.filter(maxBoundary, 'innerHeight'),
+            hitsTopOrBottom   = hitsBottom.merge(hitsTop),
+            hitsRight         = horizontalStream.filter(maxBoundary, 'innerWidth'),
+            hitsLeft          = horizontalStream.filter(minBoundary),
+            hitsRightOrLeft   = hitsRight.merge(hitsLeft)
 
         positionProperty.onValue(reDraw)
         hitsTopOrBottom.onValue(flipY)
@@ -47,7 +53,7 @@
 
         function reDraw(position) {
           context.beginPath()
-          context.arc(position.x, position.y, radius, 0, 2 * Math.PI)
+          context.rect(position.x, position.y, radius, radius)
 
           context.fillStyle   = backgroundColor
           context.lineWidth   = borderWidth
@@ -57,7 +63,8 @@
           context.stroke()
         }
 
-        function isAtMaxBoundary(dimension, position) { return position - realRadius <= 0 || position + realRadius >= window[dimension] }
+        function minBoundary(position) { return position - borderWidth / 2 <= 0 }
+        function maxBoundary(dimension, position) { return position + realRadius >= window[dimension] }
 
         function flipY() { goingDown  = !goingDown }
         function flipX() { goingRight = !goingRight }
@@ -66,11 +73,11 @@
         function nextY(currentY) { return goingDown ? currentY + speed : currentY - speed }
 
         function toNextPosition(position) { return { x: nextX(position.x), y: nextY(position.y) } }
-        function moveBall(position) { positionStream.push(position) }
+        function moveRect(position) { positionStream.push(position) }
 
         return {
           move: function(){
-            positionProperty.first().map(toNextPosition).onValue(moveBall)
+            positionProperty.first().map(toNextPosition).onValue(moveRect)
           }
         }
       }
