@@ -1,3 +1,3 @@
 # bounce
 
-See [Demo](http://htmlpreview.github.io/?https://github.com/kopzu/bounce/blob/master/index.html).
+See [Demo](http://kettuniko.github.io/bounce/index.html).
